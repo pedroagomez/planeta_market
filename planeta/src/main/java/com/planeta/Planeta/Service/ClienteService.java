@@ -29,7 +29,7 @@ public class ClienteService implements IClienteService {
 
     @Override
     public Cliente obtenerClientePorId(Long id) {
-        // Busca el cliente en el repositorio
+
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado con ID: " + id));
 
@@ -84,7 +84,7 @@ public class ClienteService implements IClienteService {
 
     private PasajeroDTO mapearPasajeroADTO(Pasajero pasajero) {
         if (pasajero == null) {
-            return null; // Manejo de null
+            return null;
         }
         PasajeroDTO dto = new PasajeroDTO();
         dto.setId(pasajero.getId());
@@ -96,12 +96,12 @@ public class ClienteService implements IClienteService {
     }
     private ViajeDTO mapearViajeADTO(Viaje viaje) {
         if (viaje == null) {
-            return null; // Manejo de null
+            return null;
         }
         ViajeDTO dto = new ViajeDTO();
         dto.setId(viaje.getId());
         dto.setFechaSalida(viaje.getFechaViaje());
-        dto.setDestino(mapearPlanetaADTO(viaje.getDestino())); // Asegúrate de implementar este método
+        dto.setDestino(mapearPlanetaADTO(viaje.getDestino()));
         dto.setAsientosDisponibles(viaje.getAsientosDisponibles());
         dto.setCapacidadTotal(viaje.getCapacidadTotal());
         dto.setPrecioPorPasajero(viaje.getPrecioPorPasajero());
@@ -133,10 +133,10 @@ public class ClienteService implements IClienteService {
 
     private List<ReservaDTO> mapearReservasADTO(List<Reserva> reservas) {
         if (reservas == null) {
-            return new ArrayList<>(); // Devuelve una lista vacía si no hay reservas
+            return new ArrayList<>();
         }
         return reservas.stream()
-                .map(this::mapearReservaADTO) // Mapea cada reserva a su DTO
+                .map(this::mapearReservaADTO)
                 .collect(Collectors.toList());
     }
 
@@ -147,9 +147,9 @@ public class ClienteService implements IClienteService {
         ReservaDTO dto = new ReservaDTO();
         dto.setId(reserva.getId());
         dto.setClienteId(reserva.getCliente().getId());
-        dto.setViaje(mapearViajeADTO(reserva.getViaje())); // Asegúrate de implementar este método
+        dto.setViaje(mapearViajeADTO(reserva.getViaje()));
         dto.setFechaReserva(reserva.getFechaReserva());
-        dto.setPasajeros(mapearPasajerosADTO(reserva.getPasajeros())); // Asegúrate de implementar este método
+        dto.setPasajeros(mapearPasajerosADTO(reserva.getPasajeros()));
         dto.setPrecioTotal(reserva.getPrecioTotal());
         return dto;
     }
@@ -159,16 +159,16 @@ public class ClienteService implements IClienteService {
 
     private List<PropiedadDTO> mapearPropiedadesADTO(List<Propiedad> propiedades) {
         if (propiedades == null) {
-            return new ArrayList<>(); // Devuelve una lista vacía si no hay propiedades
+            return new ArrayList<>();
         }
         return propiedades.stream()
-                .map(this::mapearPropiedadADTO) // Mapea cada propiedad a su DTO
+                .map(this::mapearPropiedadADTO)
                 .collect(Collectors.toList());
     }
 
     private PropiedadDTO mapearPropiedadADTO(Propiedad propiedad) {
         if (propiedad == null) {
-            return null; // Manejo de null
+            return null;
         }
         PropiedadDTO dto = new PropiedadDTO();
         dto.setId(propiedad.getId());

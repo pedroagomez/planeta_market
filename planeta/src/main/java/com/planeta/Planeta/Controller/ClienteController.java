@@ -75,14 +75,14 @@ public class ClienteController {
     @PutMapping("actualizar/{id}")
     public ResponseEntity<?> actualizarCliente(@PathVariable Long id, @RequestBody ClienteDTO clienteDTO) {
         try {
-            // Verifica si el cliente existe
+
             Cliente clienteExistenteDTO = clienteService.obtenerClientePorId(id);
             if (clienteExistenteDTO == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(Collections.singletonMap("mensaje", "Cliente no encontrado con ID: " + id));
             }
 
-            // Crea un nuevo Cliente a partir del DTO
+
             Cliente clienteExistente = new Cliente();
             clienteExistente.setId(id);
             clienteExistente.setNombre(clienteDTO.getNombre());

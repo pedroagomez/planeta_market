@@ -35,11 +35,11 @@ public class ReservaService implements IReservaService {
     @Transactional
     @Override
     public void realizarReserva(ReservaDTO reservaDTO) {
-        // Obtener el cliente
+        // Obtengo el cliente
         Cliente cliente = clienteRepository.findById(reservaDTO.getClienteId())
                 .orElseThrow(() -> new EntityNotFoundException("Cliente no encontrado"));
 
-        // Obtener el viaje
+        // Obtengo el viaje
         Viaje viaje = viajeRepository.findById(reservaDTO.getViaje().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Viaje no encontrado"));
 

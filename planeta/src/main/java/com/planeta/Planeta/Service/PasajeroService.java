@@ -52,7 +52,7 @@ public class PasajeroService implements IPasajeroService {
         pasajero.setNombre(pasajeroDTO.getNombre());
         pasajero.setApellido(pasajeroDTO.getApellido());
         pasajero.setEmail(pasajeroDTO.getEmail());
-        // No actualizamos la reserva aquí, eso debería manejarse en un servicio de Reserva
+
 
         pasajeroRepository.save(pasajero);
     }
@@ -81,7 +81,7 @@ public class PasajeroService implements IPasajeroService {
         pasajero.setNombre(dto.getNombre());
         pasajero.setApellido(dto.getApellido());
         pasajero.setEmail(dto.getEmail());
-        // La reserva se establece en otro lugar, no aquí
+
         return pasajero;
     }
 

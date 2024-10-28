@@ -52,6 +52,6 @@ public class PlanetaService implements IPlanetaService {
         if (!planetaService.existsById(id)) {
             throw new EntityNotFoundException("Cliente no encontrado con id: " + id);
         }
-        planetaService.deleteById(id); // Elimina el cliente
+        planetaService.deleteById(id);
     }
 }

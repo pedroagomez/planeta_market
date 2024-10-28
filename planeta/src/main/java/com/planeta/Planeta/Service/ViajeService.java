@@ -126,11 +126,10 @@ public class ViajeService implements IViajeService {
 
     @Override
     public void actualizarViaje(Viaje viaje) {
-        // Verifica que el viaje existe antes de actualizar
         if (!viajeRepository.existsById(viaje.getId())) {
             throw new EntityNotFoundException("No se encontró el viaje con ID: " + viaje.getId());
         }
-        viajeRepository.save(viaje); // Guarda la entidad actualizada
+        viajeRepository.save(viaje);
     }
 
     @Override

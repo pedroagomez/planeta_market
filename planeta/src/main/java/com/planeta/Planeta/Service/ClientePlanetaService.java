@@ -31,19 +31,19 @@ public class ClientePlanetaService implements IClientePlanetaService {
         Planeta planeta = planetaRepository.findById(clientePlanetaPropiedad.getPlaneta().getId())
                 .orElseThrow(() -> new RuntimeException("Planeta no encontrado"));
 
-        // Verifico que los KM no sean null
+
         Double kmCuadrados = clientePlanetaPropiedad.getKilometrosCuadrados();
         if (kmCuadrados == null) {
             throw new RuntimeException("El valor de kilómetros cuadrados no puede ser nulo");
         }
 
-        // Verifico que haya kms disponibles
+
         if (planeta.getKmCuadrados() < kmCuadrados) {
             throw new RuntimeException("No hay suficientes kilómetros cuadrados disponibles en el planeta");
         }
         planeta.setKmCuadrados((int) (planeta.getKmCuadrados() - kmCuadrados));
 
-        // Asigno el cliente y planeta a la propiedad
+
         clientePlanetaPropiedad.setCliente(cliente);
         clientePlanetaPropiedad.setPlaneta(planeta);
 
