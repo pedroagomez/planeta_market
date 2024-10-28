@@ -40,9 +40,10 @@ public class PasajeroController {
     }
 
     @PostMapping("/crear")
-    public ResponseEntity<?> crearPasajero(@Valid @RequestBody Pasajero pasajero)
+    public ResponseEntity<?> crearPasajero(@Valid @RequestBody PasajeroDTO pasajero)
     {
         try{
+
             pasajeroService.crearPasajero(pasajero);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }

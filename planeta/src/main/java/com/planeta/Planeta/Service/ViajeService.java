@@ -23,16 +23,29 @@ public class ViajeService implements IViajeService {
 
     @Autowired
     private IViajeRepository viajeRepository;
+    @Autowired
+    private IPlanetaRepository planetaRepository;
 
-    @Override
     public void crearViaje(Viaje viaje) {
+
+        if (viaje.getDestino() == null || !planetaRepository.existsById(viaje.getDestino().getId())) {
+            throw new IllegalArgumentException("El planeta especificado no existe");
+        }
         viajeRepository.save(viaje);
     }
 
     @Override
-    public Viaje obtenerViajePorId(Long id) {
-        return viajeRepository.findById(id).orElseThrow(
+    public ViajeDTO obtenerViajePorId(Long id) {
+        Viaje viaje = viajeRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Id no encontrado"));
+        ViajeDTO dto = new ViajeDTO();
+        dto.setId(viaje.getId());
+        dto.setFechaSalida(viaje.getFechaViaje());
+        dto.setDestino(mapearPlaneta(viaje.getDestino()));
+        dto.setAsientosDisponibles(viaje.getAsientosDisponibles());
+        dto.setCapacidadTotal(viaje.getCapacidadTotal());
+        dto.setPrecioPorPasajero(viaje.getPrecioPorPasajero());
+        return dto;
     }
 
     private PlanetaDTO mapearPlaneta(Planeta planeta) {
@@ -62,31 +75,28 @@ public class ViajeService implements IViajeService {
         dto.setId(viaje.getId());
         dto.setFechaSalida(viaje.getFechaViaje());
 
-        // Asegúrate de que el destino no sea nulo antes de mapear
         if (viaje.getDestino() != null) {
             dto.setDestino(mapearPlaneta(viaje.getDestino()));
         } else {
             dto.setDestino(null);
         }
 
-        // Asegúrate de que estos campos se asignen correctamente
         dto.setAsientosDisponibles(viaje.getAsientosDisponibles());
         dto.setCapacidadTotal(viaje.getCapacidadTotal());
         dto.setPrecioPorPasajero(viaje.getPrecioPorPasajero());
 
-        // Mapeo de reservas sin llamar a mapearViajeADTO para evitar recursión
-        if (viaje.getReservas() != null) {
+       /* if (viaje.getReservas() != null) {
             dto.setReservasDto(viaje.getReservas().stream()
                     .map(this::mapearReservaADTOSinViaje)
                     .collect(Collectors.toList()));
         } else {
-            dto.setReservasDto(new ArrayList<>()); // Inicializa como una lista vacía si es nulo
+            dto.setReservasDto(new ArrayList<>());
         }
-
+        */
         return dto;
     }
 
-    // Método auxiliar para mapear una Reserva a ReservaDTO sin llamar a mapearViajeADTO
+
     private ReservaDTO mapearReservaADTOSinViaje(Reserva reserva) {
         ReservaDTO dto = new ReservaDTO();
         dto.setId(reserva.getId());
@@ -95,14 +105,14 @@ public class ViajeService implements IViajeService {
 
         // Mapeo de pasajeros
         dto.setPasajeros(reserva.getPasajeros().stream()
-                .map(pasajero -> mapearPasajeroADTO(pasajero, reserva.getId())) // Pasamos el reservaId
+                .map(pasajero -> mapearPasajeroADTO(pasajero, reserva.getId()))
                 .collect(Collectors.toList()));
         dto.setPrecioTotal(reserva.getPrecioTotal());
 
         return dto;
     }
 
-    // Método auxiliar para mapear un Pasajero a PasajeroDTO
+
     private PasajeroDTO mapearPasajeroADTO(Pasajero pasajero, Long reservaId) {
         PasajeroDTO dto = new PasajeroDTO();
         dto.setId(pasajero.getId());

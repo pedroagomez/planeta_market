@@ -2,6 +2,7 @@ package com.planeta.Planeta.Controller;
 
 import com.planeta.Planeta.DTO.PasajeroDTO;
 import com.planeta.Planeta.DTO.ReservaDTO;
+import com.planeta.Planeta.DTO.ViajeDTO;
 import com.planeta.Planeta.Model.Cliente;
 import com.planeta.Planeta.Model.Pasajero;
 import com.planeta.Planeta.Model.Reserva;
@@ -10,6 +11,7 @@ import com.planeta.Planeta.Service.IClienteService;
 import com.planeta.Planeta.Service.IReservaService;
 import com.planeta.Planeta.Service.IViajeService;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,64 +29,53 @@ public class ReservaController {
 
     @Autowired
     private IReservaService reservaService;
-    @Autowired
-    private IClienteService clienteService; // Servicio para obtener clientes
 
     @Autowired
-    private IViajeService viajeService; // Servicio para obtener viajes
+    private IClienteService clienteService;
 
-
-   /* @Operation
-    @ApiResponses(value={
-            @ApiResponse(responseCode = "200", description = "Reserva creada correctamente"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos de entrada"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })*/
+    @Autowired
+    private IViajeService viajeService;
 
     @GetMapping("/traer")
-    public ResponseEntity<List<ReservaDTO>>obtenerReservas()
-    {
-        List<ReservaDTO>reserva=reservaService.obtenerTodasLasReservas();
-        return ResponseEntity.ok(reserva);
+    public ResponseEntity<List<ReservaDTO>> obtenerReservas() {
+        List<ReservaDTO> reservas = reservaService.obtenerTodasLasReservas();
+        return ResponseEntity.ok(reservas);
     }
 
     @GetMapping("/traer/{id}")
-    public ResponseEntity<ReservaDTO> obtenerReservaPorId(@PathVariable Long id)
-    {
-        ReservaDTO reserva=reservaService.obtenerReservaPorId(id);
+    public ResponseEntity<ReservaDTO> obtenerReservaPorId(@PathVariable Long id) {
+        ReservaDTO reserva = reservaService.obtenerReservaPorId(id);
         return ResponseEntity.ok(reserva);
     }
 
     @PostMapping("/crear")
     public ResponseEntity<?> crearReserva(@Valid @RequestBody ReservaDTO reservaDTO) {
-
         try {
-            Cliente cliente = clienteService.obtenerClientePorId(reservaDTO.getClienteId());
-
-            Viaje viaje = viajeService.obtenerViajePorId(reservaDTO.getViaje().getId());
-            Reserva reserva = new Reserva();
-            reserva.setCliente(cliente);
-            reserva.setViaje(viaje);
-            reserva.setFechaReserva(LocalDate.now());
-            reserva.setPasajeros(reservaDTO.getPasajeros().stream()
-                    .map(this::mapearPasajero)
-                    .collect(Collectors.toList()));
-            reserva.setPrecioTotal(calcularPrecioTotal(viaje, reserva.getPasajeros().size())); // Calcular el precio total
-
-            reservaService.realizarReserva(reserva);
-
-            ReservaDTO reservaRespuesta = reservaService.obtenerReservaPorId(reserva.getId());
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(reservaRespuesta);
-        }catch (Exception e)
-        {
+            reservaService.realizarReserva(reservaDTO);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(Collections.singletonMap("mensaje", "Reserva creada exitosamente"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("mensaje", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("mensaje", e.getMessage()));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("mensaje", "Error al crear reserva: " + e.getMessage()));
+                    .body(Collections.singletonMap("mensaje", "Error al crear la reserva: " + e.getMessage()));
         }
-
     }
 
 
+    @DeleteMapping("/cancelar/{id}")
+    public ResponseEntity<Void> cancelarReserva(@PathVariable Long id) {
+        reservaService.cancelarReserva(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
+    /*
     private Pasajero mapearPasajero(PasajeroDTO pasajeroDTO) {
         Pasajero pasajero = new Pasajero();
         pasajero.setNombre(pasajeroDTO.getNombre());
@@ -93,16 +84,18 @@ public class ReservaController {
         return pasajero;
     }
 
+    private Viaje mapearViaje(ViajeDTO viajeDTO) {
+        Viaje viaje = new Viaje();
+        viaje.setId(viajeDTO.getId());
+        viaje.setFechaViaje(viajeDTO.getFechaSalida());
+        viaje.setAsientosDisponibles(viajeDTO.getAsientosDisponibles());
+        viaje.setCapacidadTotal(viajeDTO.getCapacidadTotal());
+        viaje.setPrecioPorPasajero(viajeDTO.getPrecioPorPasajero());
+        return viaje;
+    }
 
     private double calcularPrecioTotal(Viaje viaje, int cantidadPasajeros) {
         return viaje.getPrecioPorPasajero() * cantidadPasajeros;
-    }
-
-
-    @DeleteMapping("/cancelar/{id}")
-    public ResponseEntity<Void>cancelarReserva(@PathVariable Long id)
-    {
-        reservaService.cancelarReserva(id);
-        return ResponseEntity.noContent().build();
-    }
+    }*/
 }
+

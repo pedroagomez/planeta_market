@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface IPasajeroService {
 
-    void crearPasajero(Pasajero pasajero);
+    void crearPasajero(PasajeroDTO pasajero);
 
     PasajeroDTO obtenerPasajeroPorId(Long id);
     List<PasajeroDTO>ObtenerListaPasajeros();

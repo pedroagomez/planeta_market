@@ -20,7 +20,7 @@ public class ClienteController {
     @Autowired
     private IClienteService clienteService;
 
-    @GetMapping("traer")
+    @GetMapping("/traer")
     public ResponseEntity<List<ClienteDTO>> obtenerClientes() {
         try {
             List<ClienteDTO> clientes = clienteService.obtenerCliente();
@@ -31,7 +31,7 @@ public class ClienteController {
         }
     }
 
-    @GetMapping("traer/{id}")
+    @GetMapping("/traer/{id}")
     public ResponseEntity<?> obtenerClientePorId( @PathVariable Long id) {
         try {
             Cliente cliente = clienteService.obtenerClientePorId(id);

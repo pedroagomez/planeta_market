@@ -8,7 +8,7 @@ import java.util.List;
 public interface IReservaService {
 
 
-    void realizarReserva(Reserva reserva);
+    void realizarReserva(ReservaDTO reserva);
     List<ReservaDTO>obtenerTodasLasReservas();
     ReservaDTO obtenerReservaPorId(Long id);
     void cancelarReserva(Long id);

@@ -28,27 +28,26 @@ public class ViajeController {
     }
 
     @GetMapping("/traer/{id}")
-    public ResponseEntity<Viaje> obtenerViajePorId(@PathVariable Long id) {
+    public ResponseEntity<ViajeDTO> obtenerViajePorId(@PathVariable Long id) {
         try {
-            Viaje viaje = viajeService.obtenerViajePorId(id);
+            ViajeDTO viaje = viajeService.obtenerViajePorId(id);
             return ResponseEntity.ok(viaje);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
     @PostMapping("/crear")
-    public ResponseEntity<?> crearViaje(@Valid @RequestBody Viaje viaje)
-    {
-        try
-        {
+    public ResponseEntity<?> crearViaje(@Valid @RequestBody Viaje viaje) {
+        try {
             viajeService.crearViaje(viaje);
             return ResponseEntity.status(HttpStatus.CREATED).build();
-        }catch (Exception e)
-        {
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("mensaje", "Error: " + e.getMessage()));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("mensaje", "Error al crear viaje: " + e.getMessage()));
         }
-
     }
 
 

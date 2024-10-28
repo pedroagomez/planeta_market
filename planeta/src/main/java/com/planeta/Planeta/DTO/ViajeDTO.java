@@ -16,16 +16,16 @@ public class ViajeDTO {
     private Integer asientosDisponibles;
     private Integer capacidadTotal;
     private Double precioPorPasajero;
-    private List<ReservaDTO> reservasDto;
+   // private List<ReservaDTO> reservasDto;
 
-    public ViajeDTO(Long id, LocalDate fechaSalida, PlanetaDTO destino, Integer asientosDisponibles, Integer capacidadTotal, Double precioPorPasajero, List<ReservaDTO> reservasDto) {
+    public ViajeDTO(Long id, LocalDate fechaSalida, PlanetaDTO destino, Integer asientosDisponibles, Integer capacidadTotal, Double precioPorPasajero) {
         this.id = id;
         this.fechaSalida = fechaSalida;
         this.destino = destino;
         this.asientosDisponibles = asientosDisponibles;
         this.capacidadTotal = capacidadTotal;
         this.precioPorPasajero = precioPorPasajero;
-        this.reservasDto = reservasDto;
+        //this.reservasDto = reservasDto;
     }
 
     public ViajeDTO()

@@ -18,9 +18,15 @@ public class PasajeroService implements IPasajeroService {
     private IPasajeroRepository pasajeroRepository;
 
     @Override
-    public void crearPasajero(Pasajero pasajero) {
+    public void crearPasajero(PasajeroDTO pasajeroDTO) {
+        Pasajero pasajero = new Pasajero();
+        pasajero.setId(pasajeroDTO.getId());
+        pasajero.setNombre(pasajeroDTO.getNombre());
+        pasajero.setApellido(pasajeroDTO.getApellido());
+        pasajero.setEmail(pasajeroDTO.getEmail());
         pasajeroRepository.save(pasajero);
     }
+
 
     @Override
     public PasajeroDTO obtenerPasajeroPorId(Long id) {
