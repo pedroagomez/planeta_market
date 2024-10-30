@@ -62,6 +62,7 @@ public class ClienteService implements IClienteService {
         dto.setNombre(cliente.getNombre());
         dto.setApellido(cliente.getApellido());
         dto.setMail(cliente.getMail());
+        dto.setPassword(cliente.getPassword());
 
 
         List<ClientePlanetaPropiedadDTO> propiedadesDTO = cliente.getPropiedades().stream()

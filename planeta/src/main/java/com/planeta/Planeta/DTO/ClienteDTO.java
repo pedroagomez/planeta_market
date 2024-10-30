@@ -13,14 +13,16 @@ public class ClienteDTO {
     private String nombre;
     private String apellido;
     private String mail;
+    private String password;
     private List<ClientePlanetaPropiedadDTO> propiedades;
     private List<ReservaDTO> reservas;
 
-    public ClienteDTO(Long id, String nombre, String apellido, String mail, List<ClientePlanetaPropiedadDTO> propiedades, List<ReservaDTO> reservas) {
+    public ClienteDTO(Long id, String nombre, String apellido, String mail, String password,List<ClientePlanetaPropiedadDTO> propiedades, List<ReservaDTO> reservas) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
         this.mail = mail;
+        this.password=password;
         this.propiedades = propiedades;
         this.reservas = reservas;
     }
