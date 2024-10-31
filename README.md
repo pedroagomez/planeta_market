@@ -41,6 +41,7 @@
     <li><strong>ClientePlanetaPropiedad:</strong> Relación entre cliente y terreno en un planeta.</li>
     <li><strong>Viaje:</strong> Información sobre el viaje (destino, fecha, precio, etc.) que se puede reservar.</li>
     <li><strong>Pasajero:</strong> Detalles de cada pasajero (nombre, apellido, email) y su relación con un viaje.</li>
+    <li><strong>Reserva:</strong> Información sobre las reservas realizadas por los clientes.</li>
     <li><strong>Administrador:</strong> Acceso a funcionalidades avanzadas de gestión.</li>
 </ul>
 
@@ -60,7 +61,6 @@
     <li><strong>IDE</strong> (Eclipse, IntelliJ, etc.)</li>
 </ul>
 
-
 <h2>📖 Documentación de la API</h2>
 
 <h3>Endpoints Administrativos</h3>
@@ -71,8 +71,12 @@
     <li><strong>Eliminar cliente por ID:</strong> <code>DELETE /api/v1/administradores/clientes/eliminar/{id}</code></li>
     <li><strong>Obtener todos los planetas:</strong> <code>GET /api/v1/administradores/planetas/traer</code></li>
     <li><strong>Crear planeta:</strong> <code>POST /api/v1/administradores/planetas/crear</code></li>
+    <li><strong>Actualizar planeta:</strong> <code>PUT /api/v1/administradores/planetas/actualizar</code></li>
+    <li><strong>Eliminar planeta por ID:</strong> <code>DELETE /api/v1/administradores/planetas/eliminar/{id}</code></li>
     <li><strong>Obtener todos los viajes:</strong> <code>GET /api/v1/administradores/viajes/traer</code></li>
     <li><strong>Crear viaje:</strong> <code>POST /api/v1/administradores/viajes/crear</code></li>
+    <li><strong>Actualizar viaje:</strong> <code>PUT /api/v1/administradores/viajes/actualizar</code></li>
+    <li><strong>Eliminar viaje por ID:</strong> <code>DELETE /api/v1/administradores/viajes/eliminar/{id}</code></li>
     <li><strong>Obtener todas las reservas:</strong> <code>GET /api/v1/administradores/reservas/traer</code></li>
     <li><strong>Eliminar reserva por ID:</strong> <code>DELETE /api/v1/administradores/reservas/eliminar/{id}</code></li>
 </ul>
@@ -81,6 +85,7 @@
 <ul>
     <li><strong>Obtener todos los clientes:</strong> <code>GET /api/v1/clientes/traer</code></li>
     <li><strong>Crear cliente:</strong> <code>POST /api/v1/clientes/crear</code></li>
+    <li><strong>Actualizar cliente:</strong> <code>PUT /api/v1/clientes/actualizar</code></li>
     <li><strong>Eliminar cliente por ID:</strong> <code>DELETE /api/v1/clientes/eliminar/{id}</code></li>
 </ul>
 
@@ -88,27 +93,32 @@
 <ul>
     <li><strong>Obtener todas las propiedades de clientes en planetas:</strong> <code>GET /api/v1/clientes-planetas/traer</code></li>
     <li><strong>Crear propiedad de cliente en un planeta:</strong> <code>POST /api/v1/clientes-planetas/crear</code></li>
+    <li><strong>Actualizar propiedad de cliente en un planeta:</strong> <code>PUT /api/v1/clientes-planetas/actualizar</code></li>
+    <li><strong>Eliminar propiedad de cliente por ID:</strong> <code>DELETE /api/v1/clientes-planetas/eliminar/{id}</code></li>
 </ul>
 
 <h3>Endpoints de Pasajeros</h3>
 <ul>
     <li><strong>Obtener todos los pasajeros:</strong> <code>GET /api/v1/pasajeros/traer</code></li>
     <li><strong>Crear pasajero:</strong> <code>POST /api/v1/pasajeros/crear</code></li>
-</ul>
-
-<h3>Endpoints de Planetas</h3>
-<ul>
-    <li><strong>Obtener todos los planetas:</strong> <code>GET /api/v1/planetas/traer</code></li>
-    <li><strong>Crear planeta:</strong> <code>POST /api/v1/planetas/crear</code></li>
+    <li><strong>Actualizar pasajero:</strong> <code>PUT /api/v1/pasajeros/actualizar</code></li>
+    <li><strong>Eliminar pasajero por ID:</strong> <code>DELETE /api/v1/pasajeros/eliminar/{id}</code></li>
 </ul>
 
 <h3>Endpoints de Reservas</h3>
 <ul>
     <li><strong>Obtener todas las reservas:</strong> <code>GET /api/v1/reservas/traer</code></li>
+    <li><strong>Crear reserva:</strong> <code>POST /api/v1/reservas/crear</code></li>
+    <li><strong>Actualizar reserva:</strong> <code>PUT /api/v1/reservas/actualizar</code></li>
+    <li><strong>Eliminar reserva por ID:</strong> <code>DELETE /api/v1/reservas/eliminar/{id}</code></li>
 </ul>
 
 <h3>Endpoints de Viajes</h3>
 <ul>
     <li><strong>Obtener todos los viajes:</strong> <code>GET /api/v1/viajes/traer</code></li>
     <li><strong>Reservar viaje:</strong> <code>POST /api/v1/viajes/reservar</code></li>
+    <li><strong>Actualizar viaje:</strong> <code>PUT /api/v1/viajes/actualizar</code></li>
+    <li><strong>Eliminar viaje por ID:</strong> <code>DELETE /api/v1/viajes/eliminar/{id}</code></li>
 </ul>
+
+
