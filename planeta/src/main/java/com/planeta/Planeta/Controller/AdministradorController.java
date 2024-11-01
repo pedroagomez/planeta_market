@@ -33,6 +33,21 @@ public class AdministradorController {
         }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Login acceso) {
+        try {
+            Administrador admin = administradorService.verificarCredenciales(acceso.getEmail(), acceso.getPassword());
+            return ResponseEntity.ok(admin);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "Credenciales incorrectas"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al iniciar sesión: " + e.getMessage()));
+        }
+    }
+
+
     @GetMapping("/traer")
     public ResponseEntity<List<AdministradorDTO>> obtenerAdmin() {
         try {

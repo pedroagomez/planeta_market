@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -177,6 +178,15 @@ public class ClienteService implements IClienteService {
         dto.setPlanetaId(propiedad.getPlaneta().getId());
         dto.setKilometrosCuadrados(propiedad.getKilometrosCuadrados());
         return dto;
+    }
+
+
+    public Cliente verificarCredenciales(String email, String password) {
+        Optional<Cliente> cliente = clienteRepository.buscarPorMail(email);
+        if (cliente.isPresent() && cliente.get().getPassword().equals(password)) {
+            return cliente.get();
+        }
+        throw new IllegalArgumentException("Credenciales incorrectas");
     }
 
 }

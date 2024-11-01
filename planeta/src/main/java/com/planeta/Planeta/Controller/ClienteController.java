@@ -1,6 +1,7 @@
 package com.planeta.Planeta.Controller;
 
 import com.planeta.Planeta.DTO.ClienteDTO;
+import com.planeta.Planeta.DTO.Login;
 import com.planeta.Planeta.Model.Cliente;
 
 import com.planeta.Planeta.Service.IClienteService;
@@ -45,6 +46,7 @@ public class ClienteController {
         }
     }
 
+
     @PostMapping("crear")
     public ResponseEntity<?> crearCliente(@Valid @RequestBody Cliente cliente) {
         try {
@@ -53,6 +55,20 @@ public class ClienteController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("mensaje", "Error al crear cliente: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Login acceso) {
+        try {
+            Cliente cliente = clienteService.verificarCredenciales(acceso.getEmail(), acceso.getPassword());
+            return ResponseEntity.ok(cliente);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "Credenciales incorrectas"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al iniciar sesión: " + e.getMessage()));
         }
     }
 

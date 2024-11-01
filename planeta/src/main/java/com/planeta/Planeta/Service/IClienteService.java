@@ -15,6 +15,6 @@ public interface IClienteService {
     void actualizarCliente(Cliente cliente);
 
     void eliminarCliente(Long id);
-
+    Cliente verificarCredenciales(String email, String password);
 
 }

@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -176,7 +177,7 @@ public class AdminService implements IAdminService{
     @Override
     public void agregarNuevoAdministrador(AdministradorDTO administradorDTO )
     {
-        if (adminRepository.findByMail(administradorDTO.getMail()).isPresent()) {
+        if (adminRepository.buscarPorMail(administradorDTO.getMail()).isPresent()) {
             throw new IllegalArgumentException("El correo electrónico ya está en uso");
         }
         Administrador administrador = mapearDTOAAdmin(administradorDTO);
@@ -211,6 +212,15 @@ public class AdminService implements IAdminService{
         administrador.setMail(administradorDTO.getMail());
         administrador.setPassword(administradorDTO.getPassword());
         return administrador;
+    }
+
+
+    public Administrador verificarCredenciales(String email, String password) {
+        Optional<Administrador> admin = adminRepository.buscarPorMail(email);
+        if (admin.isPresent() && admin.get().getPassword().equals(password)) {
+            return admin.get();
+        }
+        throw new IllegalArgumentException("Credenciales incorrectas");
     }
 
 }
