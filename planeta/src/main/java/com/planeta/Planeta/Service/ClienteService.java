@@ -182,7 +182,7 @@ public class ClienteService implements IClienteService {
 
 
     public Cliente verificarCredenciales(String email, String password) {
-        Optional<Cliente> cliente = clienteRepository.buscarPorMail(email);
+        Optional<Cliente> cliente = clienteRepository.findByMail(email);
         if (cliente.isPresent() && cliente.get().getPassword().equals(password)) {
             return cliente.get();
         }

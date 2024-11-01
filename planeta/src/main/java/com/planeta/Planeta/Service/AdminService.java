@@ -177,7 +177,7 @@ public class AdminService implements IAdminService{
     @Override
     public void agregarNuevoAdministrador(AdministradorDTO administradorDTO )
     {
-        if (adminRepository.buscarPorMail(administradorDTO.getMail()).isPresent()) {
+        if (adminRepository.findByMail(administradorDTO.getMail()).isPresent()) {
             throw new IllegalArgumentException("El correo electrónico ya está en uso");
         }
         Administrador administrador = mapearDTOAAdmin(administradorDTO);
@@ -216,7 +216,7 @@ public class AdminService implements IAdminService{
 
 
     public Administrador verificarCredenciales(String email, String password) {
-        Optional<Administrador> admin = adminRepository.buscarPorMail(email);
+        Optional<Administrador> admin = adminRepository.findByMail(email);
         if (admin.isPresent() && admin.get().getPassword().equals(password)) {
             return admin.get();
         }
