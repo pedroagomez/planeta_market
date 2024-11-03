@@ -216,11 +216,38 @@ public class AdminService implements IAdminService{
 
 
     public Administrador verificarCredenciales(String email, String password) {
-        Optional<Administrador> admin = adminRepository.findByMail(email);
-        if (admin.isPresent() && admin.get().getPassword().equals(password)) {
-            return admin.get();
+        Optional<Administrador> optionalAdmin = adminRepository.findByMail(email);
+
+
+        if (optionalAdmin.isPresent()) {
+            Administrador admin = optionalAdmin.get();
+
+            // Verificar si el administrador ya está conectado
+            if (admin.isLoggedIn()) {
+                throw new IllegalArgumentException("Administrador ya conectado");
+            }
+
+
+            if (admin.getPassword().equals(password)) {
+
+                admin.setLoggedIn(true);
+                adminRepository.save(admin);
+                return admin;
+            }
         }
+
         throw new IllegalArgumentException("Credenciales incorrectas");
+    }
+
+    public Administrador findByMail(String mail)
+    {
+        Optional<Administrador> admin = adminRepository.findByMail(mail);
+        return admin.orElse(null);
+    }
+
+    public void guardar(Administrador admin)
+    {
+        adminRepository.save(admin);
     }
 
 }

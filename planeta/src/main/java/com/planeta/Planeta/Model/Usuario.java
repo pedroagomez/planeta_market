@@ -33,6 +33,7 @@ public abstract class Usuario {
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 8, max = 60, message = "La contraseña debe tener entre 8 y 60 caracteres")
     private String password;
+    private boolean isLoggedIn = false;
 
     public Usuario(Long id, String nombre, String apellido, String mail, String password) {
         this.id = id;

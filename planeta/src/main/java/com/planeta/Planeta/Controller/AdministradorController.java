@@ -39,13 +39,51 @@ public class AdministradorController {
             Administrador admin = administradorService.verificarCredenciales(acceso.getEmail(), acceso.getPassword());
             return ResponseEntity.ok(admin);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("mensaje", "Credenciales incorrectas"));
+            // Manejar tanto las credenciales incorrectas como el caso en que el admin ya está conectado
+            String mensaje = e.getMessage(); // Capturamos el mensaje de la excepción
+            if ("Credenciales incorrectas".equals(mensaje)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Collections.singletonMap("mensaje", mensaje));
+            } else if ("Administrador ya conectado".equals(mensaje)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Collections.singletonMap("mensaje", mensaje));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al iniciar sesión: " + e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Collections.singletonMap("mensaje", "Error al iniciar sesión: " + e.getMessage()));
         }
     }
+
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestBody Login acceso) {
+        try {
+            Administrador admin = administradorService.findByMail(acceso.getEmail());
+
+            if (admin != null) {
+                if (admin.isLoggedIn()) { // Verificar si el administrador está conectado
+                    // Cambiar el estado de isLoggedIn a false
+                    admin.setLoggedIn(false); // Asegúrate de que tengas el método setLoggedIn en tu entidad Administrador
+                    administradorService.guardar(admin); // Guardar el estado actualizado
+
+                    return ResponseEntity.ok(Collections.singletonMap("mensaje", "Administrador desconectado: " + admin.getMail()));
+                } else {
+                    // El administrador ya estaba desconectado
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                            .body(Collections.singletonMap("mensaje", "No hay usuarios conectados"));
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Collections.singletonMap("mensaje", "Administrador no encontrado"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al cerrar sesión: " + e.getMessage()));
+        }
+    }
+
 
 
     @GetMapping("/traer")
