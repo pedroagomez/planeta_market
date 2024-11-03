@@ -20,10 +20,16 @@ public class AdministradorController {
 
     @Autowired
     private AdminService administradorService;
+    private static Administrador loggedInAdmin = null;
 
     // === Endpoints para Administradores ===
     @PostMapping("/crear")
     public ResponseEntity<?> crearAdmin(@Valid @RequestBody AdministradorDTO administrador) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+
         try {
             administradorService.agregarNuevoAdministrador(administrador);
             return new ResponseEntity<>(HttpStatus.CREATED);
@@ -32,15 +38,14 @@ public class AdministradorController {
                     .body(Collections.singletonMap("mensaje", "Error al crear admin: " + e.getMessage()));
         }
     }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Login acceso) {
         try {
             Administrador admin = administradorService.verificarCredenciales(acceso.getEmail(), acceso.getPassword());
+            loggedInAdmin=admin;
             return ResponseEntity.ok(admin);
         } catch (IllegalArgumentException e) {
-            // Manejar tanto las credenciales incorrectas como el caso en que el admin ya está conectado
-            String mensaje = e.getMessage(); // Capturamos el mensaje de la excepción
+            String mensaje = e.getMessage();
             if ("Credenciales incorrectas".equals(mensaje)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Collections.singletonMap("mensaje", mensaje));
@@ -63,14 +68,15 @@ public class AdministradorController {
             Administrador admin = administradorService.findByMail(acceso.getEmail());
 
             if (admin != null) {
-                if (admin.isLoggedIn()) { // Verificar si el administrador está conectado
-                    // Cambiar el estado de isLoggedIn a false
-                    admin.setLoggedIn(false); // Asegúrate de que tengas el método setLoggedIn en tu entidad Administrador
-                    administradorService.guardar(admin); // Guardar el estado actualizado
+                if (admin.isLoggedIn()) {
+
+                    admin.setLoggedIn(false);
+                    administradorService.guardar(admin);
+                    loggedInAdmin=null;
 
                     return ResponseEntity.ok(Collections.singletonMap("mensaje", "Administrador desconectado: " + admin.getMail()));
                 } else {
-                    // El administrador ya estaba desconectado
+
                     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                             .body(Collections.singletonMap("mensaje", "No hay usuarios conectados"));
                 }
@@ -87,18 +93,28 @@ public class AdministradorController {
 
 
     @GetMapping("/traer")
-    public ResponseEntity<List<AdministradorDTO>> obtenerAdmin() {
+    public ResponseEntity<?> obtenerAdmin() {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+
         try {
             List<AdministradorDTO> admin = administradorService.obtenerTodosLosAdministradores();
             return ResponseEntity.ok(admin);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body((List<AdministradorDTO>) Collections.singletonMap("mensaje", "Error al obtener admin: " + e.getMessage()));
+                    .body(Collections.singletonMap("mensaje", "Error al obtener admin: " + e.getMessage()));
         }
     }
 
+
     @GetMapping("/traer/{id}")
     public ResponseEntity<?> obtenerAdminId(@PathVariable Long id) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
         try {
             AdministradorDTO admin = administradorService.obtenerAdministradorPorId(id);
             return ResponseEntity.ok(admin);
@@ -113,6 +129,10 @@ public class AdministradorController {
 
     @DeleteMapping("eliminar/{id}")
     public ResponseEntity<?> eliminarAdmin(@PathVariable Long id) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
         try {
             administradorService.eliminarAdministrador(id);
             return ResponseEntity.noContent().build();
@@ -127,130 +147,280 @@ public class AdministradorController {
 
 
     // === Endpoints para Clientes ===
+    // === Endpoints para Clientes ===
     @GetMapping("/clientes/traer")
-    public ResponseEntity<List<ClienteDTO>> obtenerTodosLosClientes() {
-        return ResponseEntity.ok(administradorService.obtenerTodosLosClientes());
+    public ResponseEntity<?> obtenerTodosLosClientes() {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            List<ClienteDTO> clientes = administradorService.obtenerTodosLosClientes();
+            return ResponseEntity.ok(clientes);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al obtener clientes: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/clientes/traer/{id}")
-    public ResponseEntity<Cliente> obtenerClientePorId(@PathVariable Long id) {
-        return ResponseEntity.ok(administradorService.obtenerClientePorId(id));
+    public ResponseEntity<?> obtenerClientePorId(@PathVariable Long id) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            Cliente cliente = administradorService.obtenerClientePorId(id);
+            return ResponseEntity.ok(cliente);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al obtener el cliente: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/clientes/actualizar")
     public ResponseEntity<?> actualizarCliente(@RequestBody Cliente cliente) {
-        administradorService.actualizarCliente(cliente);
-        return ResponseEntity.ok(Collections.singletonMap("mensaje", "Cliente actualizado correctamente"));
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.actualizarCliente(cliente);
+            return ResponseEntity.ok(Collections.singletonMap("mensaje", "Cliente actualizado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al actualizar el cliente: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/clientes/eliminar/{id}")
     public ResponseEntity<?> eliminarCliente(@PathVariable Long id) {
-        administradorService.eliminarCliente(id);
-        return ResponseEntity.noContent().build();
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.eliminarCliente(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al eliminar el cliente: " + e.getMessage()));
+        }
     }
 
     // === Endpoints para Planetas ===
     @GetMapping("/planetas/traer")
-    public ResponseEntity<List<PlanetaDTO>> obtenerTodosLosPlanetas() {
-        return ResponseEntity.ok(administradorService.obtenerTodosLosPlanetas());
+    public ResponseEntity<?> obtenerTodosLosPlanetas() {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            List<PlanetaDTO> planetas = administradorService.obtenerTodosLosPlanetas();
+            return ResponseEntity.ok(planetas);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al obtener planetas: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/planetas/traer/{id}")
-    public ResponseEntity<PlanetaDTO> obtenerPlanetaPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(administradorService.obtenerPlanetaPorId(id));
+    public ResponseEntity<?> obtenerPlanetaPorId(@PathVariable Long id) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            PlanetaDTO planeta = administradorService.obtenerPlanetaPorId(id);
+            return ResponseEntity.ok(planeta);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al obtener el planeta: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/planetas/crear")
     public ResponseEntity<?> agregarNuevoPlaneta(@RequestBody Planeta planeta) {
-        administradorService.agregarNuevoPlaneta(planeta);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.agregarNuevoPlaneta(planeta);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al crear el planeta: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/planetas/actualizar")
     public ResponseEntity<?> actualizarPlaneta(@RequestBody Planeta planeta) {
-        administradorService.actualizarPlaneta(planeta);
-        return ResponseEntity.ok(Collections.singletonMap("mensaje", "Planeta actualizado correctamente"));
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.actualizarPlaneta(planeta);
+            return ResponseEntity.ok(Collections.singletonMap("mensaje", "Planeta actualizado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al actualizar el planeta: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/planetas/eliminar/{id}")
     public ResponseEntity<?> eliminarPlaneta(@PathVariable Long id) {
-        administradorService.eliminarPlaneta(id);
-        return ResponseEntity.noContent().build();
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.eliminarPlaneta(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al eliminar el planeta: " + e.getMessage()));
+        }
     }
 
     // === Endpoints para Viajes ===
     @GetMapping("/viajes/traer")
-    public ResponseEntity<List<ViajeDTO>> obtenerTodosLosViajes() {
-        return ResponseEntity.ok(administradorService.obtenerTodosLosViajes());
+    public ResponseEntity<?> obtenerTodosLosViajes() {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            List<ViajeDTO> viajes = administradorService.obtenerTodosLosViajes();
+            return ResponseEntity.ok(viajes);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al obtener viajes: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/viajes/traer/{id}")
-    public ResponseEntity<ViajeDTO> obtenerViajePorId(@PathVariable Long id) {
-        return ResponseEntity.ok(administradorService.obtenerViajePorId(id));
+    public ResponseEntity<?> obtenerViajePorId(@PathVariable Long id) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            ViajeDTO viaje = administradorService.obtenerViajePorId(id);
+            return ResponseEntity.ok(viaje);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al obtener el viaje: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/viajes/crear")
     public ResponseEntity<?> agregarNuevoViaje(@RequestBody Viaje viaje) {
-        administradorService.agregarNuevoViaje(viaje);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.agregarNuevoViaje(viaje);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al crear el viaje: " + e.getMessage()));
+        }
     }
 
     @PutMapping("/viajes/actualizar")
     public ResponseEntity<?> actualizarViaje(@RequestBody Viaje viaje) {
-        administradorService.actualizarViaje(viaje);
-        return ResponseEntity.ok(Collections.singletonMap("mensaje", "Viaje actualizado correctamente"));
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.actualizarViaje(viaje);
+            return ResponseEntity.ok(Collections.singletonMap("mensaje", "Viaje actualizado correctamente"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al actualizar el viaje: " + e.getMessage()));
+        }
     }
 
     @DeleteMapping("/viajes/eliminar/{id}")
     public ResponseEntity<?> eliminarViaje(@PathVariable Long id) {
-        administradorService.eliminarViaje(id);
-        return ResponseEntity.noContent().build();
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.eliminarViaje(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al eliminar el viaje: " + e.getMessage()));
+        }
     }
 
     // === Endpoints para Reservas ===
     @GetMapping("/reservas/traer")
-    public ResponseEntity<List<ReservaDTO>> obtenerTodasLasReservas() {
-        return ResponseEntity.ok(administradorService.obtenerTodasLasReservas());
+    public ResponseEntity<?> obtenerTodasLasReservas() {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            List<ReservaDTO> reservas = administradorService.obtenerTodasLasReservas();
+            return ResponseEntity.ok(reservas);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al obtener reservas: " + e.getMessage()));
+        }
     }
 
     @GetMapping("/reservas/traer/{id}")
-    public ResponseEntity<ReservaDTO> obtenerReservaPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(administradorService.obtenerReservaPorId(id));
+    public ResponseEntity<?> obtenerReservaPorId(@PathVariable Long id) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            ReservaDTO reserva = administradorService.obtenerReservaPorId(id);
+            return ResponseEntity.ok(reserva);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al obtener la reserva: " + e.getMessage()));
+        }
     }
 
     @PostMapping("/reservas/crear")
-    public ResponseEntity<?> agregarNuevaReserva(@RequestBody ReservaDTO reserva) {
-        administradorService.agregarNuevaReserva(reserva);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    public ResponseEntity<?> crearReserva(@RequestBody ReservaDTO reserva) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.agregarNuevaReserva(reserva);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al crear la reserva: " + e.getMessage()));
+        }
     }
+
+
 
     @DeleteMapping("/reservas/eliminar/{id}")
-    public ResponseEntity<?> cancelarReserva(@PathVariable Long id) {
-        administradorService.cancelarReserva(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    // === Endpoints para Pasajeros ===
-    @GetMapping("/pasajeros/traer")
-    public ResponseEntity<List<PasajeroDTO>> obtenerTodosLosPasajeros() {
-        return ResponseEntity.ok(administradorService.obtenerTodosLosPasajeros());
-    }
-
-    @GetMapping("/pasajeros/traer/{id}")
-    public ResponseEntity<PasajeroDTO> obtenerPasajeroPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(administradorService.obtenerPasajeroPorId(id));
-    }
-
-    @PostMapping("/pasajeros/crear")
-    public ResponseEntity<?> agregarNuevoPasajero(@RequestBody PasajeroDTO pasajero) {
-        administradorService.agregarNuevoPasajero(pasajero);
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
-    @DeleteMapping("/pasajeros/eliminar/{id}")
-    public ResponseEntity<?> eliminarPasajero(@PathVariable Long id) {
-        administradorService.eliminarPasajero(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> eliminarReserva(@PathVariable Long id) {
+        if (loggedInAdmin == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
+        }
+        try {
+            administradorService.cancelarReserva(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("mensaje", "Error al eliminar la reserva: " + e.getMessage()));
+        }
     }
 }
 
