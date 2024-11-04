@@ -25,10 +25,10 @@ public class AdministradorController {
     // === Endpoints para Administradores ===
     @PostMapping("/crear")
     public ResponseEntity<?> crearAdmin(@Valid @RequestBody AdministradorDTO administrador) {
-        if (loggedInAdmin == null) {
+       /* if (loggedInAdmin == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Collections.singletonMap("mensaje", "No autorizado. Inicie sesión."));
-        }
+        }*/
 
         try {
             administradorService.agregarNuevoAdministrador(administrador);
